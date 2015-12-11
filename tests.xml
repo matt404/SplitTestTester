@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<tests>
+    <test qtyToRun="40">
+		<stage>
+			<path>https://www.godaddy.com</path>
+		</stage>
+		<target>
+			<textToMatch>upp/free-trial</textToMatch>
+			<path>https://www.godaddy.com/websites/online-store</path>
+		</target>
+	</test>
+</tests>
