@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <tests>
-    <test qtyToRun="40">
+    <test qtyToRun="1">
 		<stage>
 			<path>https://www.godaddy.com</path>
 		</stage>

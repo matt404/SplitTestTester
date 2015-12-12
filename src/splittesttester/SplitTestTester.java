@@ -53,9 +53,9 @@ public class SplitTestTester {
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element testElement = (Element) nNode;
 					
-					RunTest(eElement);
+					RunTest(testElement);
 
 				}
 			}
@@ -68,73 +68,79 @@ public class SplitTestTester {
 		}
 	}
 
-	public static boolean RunTest(Element eElement){
+	public static boolean RunTest(Element testElement){
 		boolean blnSiteIsUp = false;
 		
-		int qtyToRun = Integer.parseInt(eElement.getAttribute("qtyToRun"));
+		int qtyToRun = Integer.parseInt(testElement.getAttribute("qtyToRun"));
 		
-		NodeList nodeListStage = eElement.getElementsByTagName("stage");
-		NodeList nodeListTarget = eElement.getElementsByTagName("target");
-		String cookies = "";
+		NodeList nodeListStage = testElement.getElementsByTagName("stage");
+		NodeList nodeListTarget = testElement.getElementsByTagName("target");
 		
-		if(nodeListStage.getLength() > 0){
-			NodeList stagePaths = nodeListStage.item(0).getChildNodes();
-			for (int temp = 0; temp < stagePaths.getLength(); temp++) {
-				Node itemNode = stagePaths.item(temp);
-				if (itemNode.getNodeType() == Node.ELEMENT_NODE) {
-					String stagePath = itemNode.getTextContent();
-					System.out.println(stagePath);
-					
-					try{
-						URL url = new URL(stagePath);
-						URLConnection urlConn = url.openConnection();
-						urlConn.setReadTimeout(5000);
-						urlConn.setConnectTimeout(10000);
-						urlConn.connect();
+		for(int i=0; i < qtyToRun; i++){
 
-						String headerName=null;
-						for (int i=1; (headerName = urlConn.getHeaderFieldKey(i))!=null; i++) {
-							if (headerName.equals("Set-Cookie")) {
-								cookies = urlConn.getHeaderField(i);
-								System.out.println(urlConn.getHeaderField(i));
+			CookieManager cm = new CookieManager();
+			if(nodeListStage.getLength() > 0){
+				NodeList stagePaths = nodeListStage.item(0).getChildNodes();
+				for (int temp = 0; temp < stagePaths.getLength(); temp++) {
+					Node itemNode = stagePaths.item(temp);
+					if (itemNode.getNodeType() == Node.ELEMENT_NODE) {
+						String stagePath = itemNode.getTextContent();
+						System.out.println(stagePath);
+
+						try{
+							URL url = new URL(stagePath);
+							URLConnection urlConn = url.openConnection();
+							urlConn.setReadTimeout(5000);
+							urlConn.setConnectTimeout(10000);
+							urlConn.connect();
+
+							String headerName=null;
+							int cookieCounter = 0;
+							for (int headerIndex=1; (headerName = urlConn.getHeaderFieldKey(headerIndex))!=null; headerIndex++) {
+								if (headerName.equals("Set-Cookie")) {
+									cookies[cookieCounter] = urlConn.getHeaderField(headerIndex);
+									cookieCounter++;
+									System.out.println(urlConn.getHeaderField(headerIndex));
+								}
 							}
+
+							BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+							String inputLine;
+							while ((inputLine = in.readLine()) != null) {
+								//System.out.println(inputLine);
+							}
+							in.close();
 						}
-	
-						BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
-						String inputLine;
-						while ((inputLine = in.readLine()) != null) {
-							//System.out.println(inputLine);
+						catch (MalformedURLException e) { 
+							e.printStackTrace();
+						} 
+						catch (IOException e) {   
+							e.printStackTrace();
 						}
-						in.close();
-					}
-					catch (MalformedURLException e) { 
-						e.printStackTrace();
-					} 
-					catch (IOException e) {   
-						e.printStackTrace();
 					}
 				}
 			}
-		}
-		
-		if(nodeListTarget.getLength() > 0){
-			NodeList targetItems = nodeListTarget.item(0).getChildNodes();
-			for (int temp = 0; temp < targetItems.getLength(); temp++) {
-				Node itemNode = targetItems.item(temp);
-				if (itemNode.getNodeType() == Node.ELEMENT_NODE) {
-					String targetPath = "";
-					String targetMatchString = "";
-					if("path".equals(itemNode.getNodeName())){
-						targetPath = itemNode.getTextContent();
+
+			if(nodeListTarget.getLength() > 0){
+				NodeList targetItems = nodeListTarget.item(0).getChildNodes();
+				for (int temp = 0; temp < targetItems.getLength(); temp++) {
+					Node itemNode = targetItems.item(temp);
+					if (itemNode.getNodeType() == Node.ELEMENT_NODE) {
+						String targetPath = "";
+						String targetMatchString = "";
+						if("path".equals(itemNode.getNodeName())){
+							targetPath = itemNode.getTextContent();
+						}
+						if("textToMatch".equals(itemNode.getNodeName())){
+							targetMatchString = itemNode.getTextContent();
+						}
+						System.out.println(targetPath);
+						System.out.println(targetMatchString);
 					}
-					if("textToMatch".equals(itemNode.getNodeName())){
-						targetMatchString = itemNode.getTextContent();
-					}
-					System.out.println(targetPath);
-					System.out.println(targetMatchString);
 				}
-			}
+			}			
 		}
+
 		return blnSiteIsUp;
 	}
 }
