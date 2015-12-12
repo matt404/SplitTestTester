@@ -93,6 +93,7 @@ public class CookieManager {
 				// them as a special case: 
 				if (st.hasMoreTokens()) {
 					String token = st.nextToken();
+//					System.out.println(token);
 					String name = token.substring(0, token.indexOf(NAME_VALUE_SEPARATOR));
 					String value = token.substring(token.indexOf(NAME_VALUE_SEPARATOR) + 1, token.length());
 					domainStore.put(name, cookie);
@@ -101,8 +102,10 @@ public class CookieManager {
 
 				while (st.hasMoreTokens()) {
 					String token = st.nextToken();
-					cookie.put(token.substring(0, token.indexOf(NAME_VALUE_SEPARATOR)).toLowerCase(),
-							token.substring(token.indexOf(NAME_VALUE_SEPARATOR) + 1, token.length()));
+					if(token.indexOf(NAME_VALUE_SEPARATOR) > 0){
+						cookie.put(token.substring(0, token.indexOf(NAME_VALUE_SEPARATOR)).toLowerCase(),
+								token.substring(token.indexOf(NAME_VALUE_SEPARATOR) + 1, token.length()));
+					}
 				}
 			}
 		}
